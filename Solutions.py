@@ -2,7 +2,7 @@ import numpy as np
 from math import sqrt
 ### global section.
 
-points = [(0,0),(4,2),(6,3),(5,7)]
+points = [(0,0),(4,2),(6,3),(5,7),(3,100),(1,104),(7,90)]
 
 #this algorithm runs the distance formula on two points.
 def distance(a,b):
@@ -28,9 +28,10 @@ def bruteForceSmallestDistance(pts):
      # the following points
      # biggest integer value
      minimum = 2147483647
+     ArrSize = len(pts)
      #print("length of points is " + str(len(pts)))
-     for i in range(len(pts)):
-         for j in range(i+1,len(pts)):
+     for i in range(ArrSize):
+         for j in range(i+1,ArrSize):
              #print("i point is " + str(pts[i]))
              #print("j point is " + str(pts[j]))
              if distance(pts[i],pts[j]) < minimum:
@@ -53,6 +54,66 @@ This problem requires that we find the smallest distance between two points
 but instead of Brute-Force, we are going to use a Divide and Conquer 
 algorithm.
 '''
+
+#TODO: recursivy this. Right now it works for breaking it in half once.
+def DnCShortestDistance(pts):
+    Size = len(pts)
+    minimum = 2147483647
+    minimumLeft = 2147483647
+    minimumRight = 2147483647
+    minimumMiddle = 2147483647
+    #initializing all the lists
+    leftList = [(0,0)] * int(Size/2)
+    rightList = [(0,0)] * (int(Size/2)+Size%2)
+    middleList = []
+    '''
+    if Size >= 5:
+        #size of intersection is 5. for 5 points.
+        print("size of intersection is 5")
+        middleList = [(0,0)] * 5
+    else:
+        print("size of intersection is " + str(Size))
+        middleList = [(0,0)] * Size
+        #size of intersection is amount of points there are.
+    '''
+
+    # need to sort by X first
+    pts.sort(key = lambda pts:pts[0])
+
+    # need to find the middle x position
+    midXPos = (pts[0][0] + pts[Size-1][0])/2
+    #defining the lists to the points
+    #sortedX = pts.sorted(pts, key = lambda x: x[0])
+    # do I need to recursively keep breaking it down in half or just brute force the left and the right.
+    leftList = pts[0:len(leftList)]
+    rightList = pts[len(leftList):Size]
+    minimumLeft = bruteForceSmallestDistance(leftList)
+    minimumRight = bruteForceSmallestDistance(rightList)
+    minimum = min(minimumLeft, minimumRight)
+    # finding the starting position of the middle section to look at. 
+    beginSpanX = midXPos - minimum
+    endingSpanX = midXPos + minimum
+    #need to sort by Y
+    pts.sort(key = lambda pts:pts[1])
+    #check if it is in the span of x and y 
+    pts.reverse()
+    for mid in pts:
+        #check if it is in the span
+        if mid[0] <= endingSpanX and mid[0] >= beginSpanX:
+            middleList.append(mid)
+            #break free if we have our first 5 elements.
+            if len(middleList) == 5:
+                break
+
+
+    minimumMiddle = bruteForceSmallestDistance(middleList)
+    minimum = min(minimum,minimumMiddle)
+
+    print("The size of left and right respectfully are " + str(len(leftList)) +" " + str(len(rightList)))
+    return minimum
+
+
+#split the set in half.
 
 
 '''
@@ -94,5 +155,6 @@ already found. That min being d.
 #problem 1. 
 print("The smallest distance by brute force is " + str(bruteForceSmallestDistance(points)))
 
-
+# problem 2
+print("The smallest distance by Divide and conquer is " + str(DnCShortestDistance(points)))
 
