@@ -8,8 +8,8 @@ points = [(0,0),(4,2),(6,3),(5,7)]
 def distance(a,b):
     diffX = a[0]-b[0]
     diffY = a[1]-b[1]
-    print("diff x is " + str(diffX * diffX))
-    print("diff y is " + str(diffY * diffY))
+    #print("diff x is " + str(diffX * diffX))
+    #print("diff y is " + str(diffY * diffY))
     dist = sqrt(diffX*diffX + diffY*diffY)
     return dist
 
@@ -27,15 +27,14 @@ def bruteForceSmallestDistance(pts):
      # then take the next point and compare to 
      # the following points
      # biggest integer value
-     # breaks when I allow for J in range of len(pts) need to figure out why and if that will be a problem for the algorithm.
-     minimum = 24444444
+     minimum = 2147483647
      #print("length of points is " + str(len(pts)))
      for i in range(len(pts)):
-         for j in range(i+1,len(pts)-1):
+         for j in range(i+1,len(pts)):
+             #print("i point is " + str(pts[i]))
+             #print("j point is " + str(pts[j]))
              if distance(pts[i],pts[j]) < minimum:
                 minimum = distance(pts[i],pts[j])
-                print("i point is " + str(pts[i]))
-                print("j point is " + str(pts[j]))
      return minimum   
 
 
