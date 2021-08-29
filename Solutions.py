@@ -1,8 +1,17 @@
 import numpy as np
+import pandas as pd
+import time
+from random import randint
 from math import sqrt
+import matplotlib.pyplot as plt
 ### global section.
 
+plt.close("all")
+#test points 
 points = [(0,0),(4,2),(6,3),(5,7),(3,100),(1,104),(7,90)]
+
+#random points for complexity measurement
+randomPoints  = [(randint(0, 1000),randint(0, 1000)) for i in range(1000)]
 
 #this algorithm runs the distance formula on two points.
 def distance(a,b):
@@ -38,7 +47,14 @@ def bruteForceSmallestDistance(pts):
                 minimum = distance(pts[i],pts[j])
      return minimum   
 
-
+def timeBruteForceSmallestDistance():
+    times = []
+    for x in range(0,1000,10):
+        start_time = time.time()
+        list2 = bruteForceSmallestDistance(randomPoints[0:x])
+        elapsed_time = time.time()-start_time
+        times.append(elapsed_time)
+    return times
 
 '''
 Idea of this approach is to look at all distances that we can find 
@@ -56,6 +72,7 @@ algorithm.
 '''
 
 #TODO: recursivy this. Right now it works for breaking it in half once.
+#TODO: plot the time. Might need a certain library.
 def DnCShortestDistance(pts):
     Size = len(pts)
     minimum = 2147483647
@@ -81,7 +98,10 @@ def DnCShortestDistance(pts):
     pts.sort(key = lambda pts:pts[0])
 
     # need to find the middle x position
-    midXPos = (pts[0][0] + pts[Size-1][0])/2
+    if Size > 1:
+        midXPos = (pts[0][0] + pts[Size-1][0])/2
+    else:
+        return   
     #defining the lists to the points
     #sortedX = pts.sorted(pts, key = lambda x: x[0])
     # do I need to recursively keep breaking it down in half or just brute force the left and the right.
@@ -109,9 +129,17 @@ def DnCShortestDistance(pts):
     minimumMiddle = bruteForceSmallestDistance(middleList)
     minimum = min(minimum,minimumMiddle)
 
-    print("The size of left and right respectfully are " + str(len(leftList)) +" " + str(len(rightList)))
+    #print("The size of left and right respectfully are " + str(len(leftList)) +" " + str(len(rightList)))
     return minimum
 
+def timeDnCShortestDistance():
+    times = []
+    for x in range(0,1000,10):
+        start_time = time.time()
+        list2 = DnCShortestDistance(randomPoints[0:x])
+        elapsed_time = time.time()-start_time
+        times.append(elapsed_time)
+    return times
 
 #split the set in half.
 
@@ -154,7 +182,30 @@ already found. That min being d.
 
 #problem 1. 
 print("The smallest distance by brute force is " + str(bruteForceSmallestDistance(points)))
+complexityPoints = []
+complexityPoints = timeBruteForceSmallestDistance()
+
+'''
+plt.plot(range(0,1000,10),complexityPoints)
+plt.xlabel('size: N')
+plt.ylabel('time(S)')
+plt.title('Run Time for Brute Force Approach')
+plt.show()
+'''
+
 
 # problem 2
 print("The smallest distance by Divide and conquer is " + str(DnCShortestDistance(points)))
+
+
+complexityPoints = []
+complexityPoints = timeDnCShortestDistance()
+plt.plot(range(0,1000,10),complexityPoints)
+plt.xlabel('size: N')
+plt.ylabel('time(S)')
+plt.title('Run Time for Divide and Conquer approach')
+plt.show()
+
+
+
 
