@@ -35,7 +35,7 @@ def bruteForceSmallestDistance(pts):
      #take one point then compare to all other points
      # then take the next point and compare to 
      # the following points
-     # biggest integer value
+     # biggest integer value]
      minimum = 2147483647
      ArrSize = len(pts)
      #print("length of points is " + str(len(pts)))
@@ -49,11 +49,12 @@ def bruteForceSmallestDistance(pts):
 
 def timeBruteForceSmallestDistance():
     times = []
-    for x in range(0,1000,10):
+    for x in range(0,300,10):
         start_time = time.time()
         list2 = bruteForceSmallestDistance(randomPoints[0:x])
         elapsed_time = time.time()-start_time
         times.append(elapsed_time)
+    
     return times
 
 '''
@@ -85,9 +86,7 @@ def shortestDistStrip(pts,dist):
         minimum = min(List)
     return minimum
 
-#TODO: recursivy this. Right now it works for breaking it in half once.
-#TODO: plot the time. Might need a certain library.
-def DnCShortestDistance(half,pts,n):
+def DnCShortestDistance(half,ySortedPts,n):
     Size = len(half)
     minimum = 2147483647
     minimumLeft = 2147483647
@@ -113,8 +112,6 @@ def DnCShortestDistance(half,pts,n):
     '''
 
     # need to sort by X first
-    half.sort(key = lambda half:half[0])
-
 
     # need to find the middle x position
     mid = n // 2
@@ -124,36 +121,44 @@ def DnCShortestDistance(half,pts,n):
     # do I need to recursively keep breaking it down in half or just brute force the left and the right.
     leftList = half[:mid]
     rightList = half[mid:]
-    minimumLeft = DnCShortestDistance(leftList,pts,mid)
-    minimumRight = DnCShortestDistance(rightList,pts,n-mid)
+    minimumLeft = DnCShortestDistance(leftList,ySortedPts,mid)
+    minimumRight = DnCShortestDistance(rightList,ySortedPts,n-mid)
     minimum = min(minimumLeft, minimumRight)
     # finding the starting position of the middle section to look at. 
     beginSpanX = midPoint[0] - minimum
     endingSpanX = midPoint[0] + minimum
-    #need to sort by Y
-    pts.sort(key = lambda pts:pts[1])
+    #Use y sorted points
     #check if it is in the span of x and y 
-    pts.reverse()
+    ySortedPts.reverse()
     # need to find the points in the strip.
-    for strip in pts:
+    for strip in ySortedPts:
         #check if it is in the span
         if strip[0] <= endingSpanX and strip[0] >= beginSpanX:
             stripList.append(strip)
             #break free if we have our first 5 elements.
-            '''if len(middleList) == 5:
-                break
-               '''
+            
     minimumStrip = shortestDistStrip(stripList,minimum)
     minimum = min(minimum,minimumStrip)
 
     #print("The size of left and right respectfully are " + str(len(leftList)) +" " + str(len(rightList)))
     return minimum
 
+def DivideAndConquerDistanceAlgorithm(pts):
+    # this code is for sorting before passing to recursion
+    pts.sort(key = lambda pts:pts[0])
+    xPts = pts[:]
+    pts.sort(key = lambda pts:pts[1])
+    yPts = pts[:]
+    minDist = DnCShortestDistance(xPts,yPts,len(xPts))
+    return minDist
+
+
 def timeDnCShortestDistance():
     times = []
-    for x in range(0,1000,10):
+    
+    for x in range(0,300,10):
         start_time = time.time()
-        list2 = DnCShortestDistance(randomPoints[0:x],randomPoints[0:x],x)
+        list2 = DivideAndConquerDistanceAlgorithm(randomPoints[0:x])
         elapsed_time = time.time()-start_time
         times.append(elapsed_time)
     return times
@@ -200,24 +205,29 @@ already found. That min being d.
 #problem 1. 
 print("The smallest distance by brute force is " + str(bruteForceSmallestDistance(points)))
 complexityPoints = []
-#complexityPoints = timeBruteForceSmallestDistance()
+complexityPoints = timeBruteForceSmallestDistance()
+#complexityPoints = [0,0]
+#complexityPoints[1] = timeDnCShortestDistance()
 
-'''
-plt.plot(range(0,1000,10),complexityPoints)
+plt.plot(range(0,300,10),complexityPoints)
+#plt.plot(range(2),complexityPoints)
 plt.xlabel('size: N')
 plt.ylabel('time(S)')
 plt.title('Run Time for Brute Force Approach')
 plt.show()
-'''
+
 
 
 # problem 2
-print("The smallest distance by Divide and conquer is " + str(DnCShortestDistance(points,points,len(points))))
 
+print("The smallest distance by Divide and conquer is " + str(DivideAndConquerDistanceAlgorithm(points)))
 
 complexityPoints = []
 complexityPoints = timeDnCShortestDistance()
-plt.plot(range(0,1000,10),complexityPoints)
+#complexityPoints = [0,0]
+#complexityPoints[1] = timeDnCShortestDistance()
+plt.plot(range(0,300,10),complexityPoints)
+#plt.plot(range(2),complexityPoints)
 plt.xlabel('size: N')
 plt.ylabel('time(S)')
 plt.title('Run Time for Divide and Conquer approach')
