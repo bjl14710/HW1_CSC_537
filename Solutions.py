@@ -73,16 +73,19 @@ algorithm.
 
 #TODO: recursivy this. Right now it works for breaking it in half once.
 #TODO: plot the time. Might need a certain library.
-def DnCShortestDistance(pts):
+def DnCShortestDistance(half,pts,n):
     Size = len(pts)
     minimum = 2147483647
     minimumLeft = 2147483647
     minimumRight = 2147483647
     minimumMiddle = 2147483647
     #initializing all the lists
-    leftList = [(0,0)] * int(Size/2)
-    rightList = [(0,0)] * (int(Size/2)+Size%2)
+    leftList = []
+    rightList = []
     middleList = []
+    
+    if n <= 3:
+        return bruteForceSmallestDistance(pts)
     '''
     if Size >= 5:
         #size of intersection is 5. for 5 points.
@@ -97,30 +100,30 @@ def DnCShortestDistance(pts):
     # need to sort by X first
     pts.sort(key = lambda pts:pts[0])
 
+
     # need to find the middle x position
-    if Size > 1:
-        midXPos = (pts[0][0] + pts[Size-1][0])/2
-    else:
-        return   
-    #defining the lists to the points
+    mid = n // 2
+    midPoint = half[mid]
+    # #defining the lists to the points
     #sortedX = pts.sorted(pts, key = lambda x: x[0])
     # do I need to recursively keep breaking it down in half or just brute force the left and the right.
-    leftList = pts[0:len(leftList)]
-    rightList = pts[len(leftList):Size]
-    minimumLeft = bruteForceSmallestDistance(leftList)
-    minimumRight = bruteForceSmallestDistance(rightList)
+    leftList = pts[:Size//2]
+    rightList = pts[Size//2:]
+    minimumLeft = DnCShortestDistance(leftList,pts,mid)
+    minimumRight = DnCShortestDistance(rightList,pts,n-mid)
     minimum = min(minimumLeft, minimumRight)
     # finding the starting position of the middle section to look at. 
-    beginSpanX = midXPos - minimum
-    endingSpanX = midXPos + minimum
+    beginSpanX = midPoint[0] - minimum
+    endingSpanX = midPoint[0] + minimum
     #need to sort by Y
     pts.sort(key = lambda pts:pts[1])
     #check if it is in the span of x and y 
     pts.reverse()
-    for mid in pts:
+    # need to change name of X
+    for strip in pts:
         #check if it is in the span
-        if mid[0] <= endingSpanX and mid[0] >= beginSpanX:
-            middleList.append(mid)
+        if strip[0] <= endingSpanX and strip[0] >= beginSpanX:
+            middleList.append(strip)
             #break free if we have our first 5 elements.
             if len(middleList) == 5:
                 break
@@ -136,7 +139,7 @@ def timeDnCShortestDistance():
     times = []
     for x in range(0,1000,10):
         start_time = time.time()
-        list2 = DnCShortestDistance(randomPoints[0:x])
+        list2 = DnCShortestDistance(randomPoints[0:x],randomPoints[0:x],x)
         elapsed_time = time.time()-start_time
         times.append(elapsed_time)
     return times
@@ -195,7 +198,7 @@ plt.show()
 
 
 # problem 2
-print("The smallest distance by Divide and conquer is " + str(DnCShortestDistance(points)))
+print("The smallest distance by Divide and conquer is " + str(DnCShortestDistance(points,points,len(points))))
 
 
 complexityPoints = []
