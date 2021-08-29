@@ -71,21 +71,36 @@ but instead of Brute-Force, we are going to use a Divide and Conquer
 algorithm.
 '''
 
+def shortestDistStrip(pts,dist):
+    Size = len(pts)
+    minimum = 2147483647
+    List = []
+    #look through set, check to see that the y values are of a certain distance less than dist.
+    for i in range(Size):
+        j = i + 1
+        while j < Size and (pts[i][1]-pts[j][1] < dist):
+            List.append(distance(pts[j],pts[i]))
+            j = j + 1
+    if len(List) > 0:
+        minimum = min(List)
+    return minimum
+
 #TODO: recursivy this. Right now it works for breaking it in half once.
 #TODO: plot the time. Might need a certain library.
 def DnCShortestDistance(half,pts,n):
-    Size = len(pts)
+    Size = len(half)
     minimum = 2147483647
     minimumLeft = 2147483647
     minimumRight = 2147483647
-    minimumMiddle = 2147483647
+    minimumStrip = 2147483647
     #initializing all the lists
     leftList = []
     rightList = []
-    middleList = []
-    
+    stripList = []
+
+
     if n <= 3:
-        return bruteForceSmallestDistance(pts)
+        return bruteForceSmallestDistance(half)
     '''
     if Size >= 5:
         #size of intersection is 5. for 5 points.
@@ -98,7 +113,7 @@ def DnCShortestDistance(half,pts,n):
     '''
 
     # need to sort by X first
-    pts.sort(key = lambda pts:pts[0])
+    half.sort(key = lambda half:half[0])
 
 
     # need to find the middle x position
@@ -107,8 +122,8 @@ def DnCShortestDistance(half,pts,n):
     # #defining the lists to the points
     #sortedX = pts.sorted(pts, key = lambda x: x[0])
     # do I need to recursively keep breaking it down in half or just brute force the left and the right.
-    leftList = pts[:Size//2]
-    rightList = pts[Size//2:]
+    leftList = half[:mid]
+    rightList = half[mid:]
     minimumLeft = DnCShortestDistance(leftList,pts,mid)
     minimumRight = DnCShortestDistance(rightList,pts,n-mid)
     minimum = min(minimumLeft, minimumRight)
@@ -119,18 +134,17 @@ def DnCShortestDistance(half,pts,n):
     pts.sort(key = lambda pts:pts[1])
     #check if it is in the span of x and y 
     pts.reverse()
-    # need to change name of X
+    # need to find the points in the strip.
     for strip in pts:
         #check if it is in the span
         if strip[0] <= endingSpanX and strip[0] >= beginSpanX:
-            middleList.append(strip)
+            stripList.append(strip)
             #break free if we have our first 5 elements.
-            if len(middleList) == 5:
+            '''if len(middleList) == 5:
                 break
-
-
-    minimumMiddle = bruteForceSmallestDistance(middleList)
-    minimum = min(minimum,minimumMiddle)
+               '''
+    minimumStrip = shortestDistStrip(stripList,minimum)
+    minimum = min(minimum,minimumStrip)
 
     #print("The size of left and right respectfully are " + str(len(leftList)) +" " + str(len(rightList)))
     return minimum
@@ -186,7 +200,7 @@ already found. That min being d.
 #problem 1. 
 print("The smallest distance by brute force is " + str(bruteForceSmallestDistance(points)))
 complexityPoints = []
-complexityPoints = timeBruteForceSmallestDistance()
+#complexityPoints = timeBruteForceSmallestDistance()
 
 '''
 plt.plot(range(0,1000,10),complexityPoints)
