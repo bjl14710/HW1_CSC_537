@@ -181,8 +181,77 @@ already found. That min being d.
 '''
 ### problem 3
 
+'''
+for this problem. Shouls look at Convex hull by looking at farthest left 
+point, then going through Every single point. A segment is used to represent
+the Convex Hull if and only if all other points are on the same side of 
+that segment.
+'''
 
+def slope(a,b):
+    m = (b[1]-a[1])/(b[0]-a[0])
+    return m
 
+#y=mx+b so b = y-mx
+def findYIntersect(a,m):
+    YIntersect = a[1]-m*a[0]
+    return YIntersect
+
+def tangentLineCompare(a,b,compare):
+    m = slope(a,b)
+    const = findYIntersect(a, m)
+    bigger = False
+    if compare[0]*m + const <= compare[1]:
+        bigger = True
+    return bigger
+
+def BruteForceConvexHull(pts):
+    convexHull = []
+    #loop through all segments and make a line between the two.
+    # use the y=mx+b
+    m = None
+    for i in range(len(pts)):
+        for j in range(len(pts)):
+            if j == i and i >= len(pts) - 1:
+                j = 0
+            elif j == i and i < len(pts):
+                j = i + 1
+            if j >= len(pts):
+                j = 0
+            #find slope
+            m = slope(pts[i],pts[j])
+            #use slope to find line intersect
+            YIntersect = findYIntersect(pts[i], m)
+            #for every point that is not i or j
+            k = j + 1
+            if k >= len(pts):
+                k = 0
+            bigger = tangentLineCompare(pts[i], pts[j], pts[k])
+            #check that every point is checked even if we passed
+            #it already.
+            cnt = 0
+            while cnt < len(pts):
+                k = k + 1
+                # reset k to check the points before the 
+                # line segment.
+                # don't want to check the points that we are using
+                if k == i or k == j:
+                    k = j + 1
+                if k >= len(pts):
+                    k = 0
+                #if the comparison and bigger variable disagree, then this segment is not an end to the complex hull.
+                if tangentLineCompare(pts[i], pts[j], pts[k]) != bigger:
+                    break      
+                cnt = cnt + 1
+            # if we reach the end of the while loop without any breaks then all the points are on one side. 
+            # so let's add it. 
+            if cnt == len(pts):
+                if pts[i] not in convexHull:
+                    convexHull.append(pts[i])
+                if pts[j] not in convexHull:
+                    convexHull.append(pts[j])
+            cnt = 0
+    return convexHull
 
 
 ### problem 4
@@ -235,4 +304,51 @@ plt.show()
 
 
 
+# do I need to graph the closest dots???
 
+
+# definetly have to graph the complex hull
+
+
+
+# graphing the points 
+xPts = []
+yPts = []
+for i in range(len(points)):
+    xPts.append(points[i][0])
+    yPts.append(points[i][1])
+
+plt.scatter(xPts,yPts, marker='o')
+'''
+df = pd.DataFrame(points,
+                    columns= ['x', 'y'])
+
+ax1 = df.plot.scatter(x='x', y='y')
+'''
+
+
+
+#graphing problem 3
+
+
+print("the points for the convex hull through brute force is " + str(BruteForceConvexHull(points)))
+
+
+complexityPoints = []
+complexityPoints = BruteForceConvexHull(points)
+xPts = []
+yPts = []
+for i in range(len(BruteForceConvexHull(points))):
+    xPts.append(complexityPoints[i][0])
+    yPts.append(complexityPoints[i][1])
+#complexityPoints = [0,0]
+#complexityPoints[1] = timeDnCShortestDistance()
+xPts.append(xPts[0])
+yPts.append(yPts[0])
+plt.plot(xPts,yPts)
+#plt.plot(range(2),complexityPoints)
+
+plt.xlabel('x points')
+plt.ylabel('y points')
+plt.title('convex hull brute force')
+plt.show()
