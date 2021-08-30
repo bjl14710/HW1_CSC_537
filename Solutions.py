@@ -189,7 +189,8 @@ that segment.
 '''
 
 def slope(a,b):
-    m = (b[1]-a[1])/(b[0]-a[0])
+    if b[0] - a[0] != 0:
+        m = (b[1]-a[1])/(b[0]-a[0])
     return m
 
 #y=mx+b so b = y-mx
@@ -239,6 +240,8 @@ def BruteForceConvexHull(pts):
                     k = j + 1
                 if k >= len(pts):
                     k = 0
+                if k == i or k == j:
+                    k = j + 1
                 #if the comparison and bigger variable disagree, then this segment is not an end to the complex hull.
                 if tangentLineCompare(pts[i], pts[j], pts[k]) != bigger:
                     break      
