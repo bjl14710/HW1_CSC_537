@@ -201,18 +201,25 @@ def findYIntersect(a,m):
 def tangentLineCompare(a,b,compare):
     m = slope(a,b)
     const = findYIntersect(a, m)
-    bigger = False
-    if compare[0]*m + const <= compare[1]:
-        bigger = True
+    bigger = 3
+    if compare[0]*m + const < compare[1]:
+        bigger = 0
+    elif compare[0]*m + const > compare[1]:
+        bigger = 1
+    elif compare[0]*m + const == compare[1]:
+        bigger = 2
     return bigger
 
 def BruteForceConvexHull(pts):
+    #sorting by x to get farthest left point.
+    pts.sort(key = lambda pts:pts[0])
     convexHull = []
+    convexHull.append(pts[0])
     #loop through all segments and make a line between the two.
     # use the y=mx+b
     m = None
     for i in range(len(pts)):
-        for j in range(len(pts)):
+        for j in range(i+1,len(pts)):
             if j == i and i >= len(pts) - 1:
                 j = 0
             elif j == i and i < len(pts):
@@ -224,36 +231,50 @@ def BruteForceConvexHull(pts):
             #use slope to find line intersect
             YIntersect = findYIntersect(pts[i], m)
             #for every point that is not i or j
-            k = j + 1
-            if k >= len(pts):
-                k = 0
-            bigger = tangentLineCompare(pts[i], pts[j], pts[k])
+            # k = j + 1
+            # if k >= len(pts):
+            #     k = 0
+            # bigger = tangentLineCompare(pts[i], pts[j], pts[k])
             #check that every point is checked even if we passed
             #it already.
-            cnt = 0
-            while cnt < len(pts):
-                k = k + 1
-                # reset k to check the points before the 
-                # line segment.
-                # don't want to check the points that we are using
-                if k == i or k == j:
-                    k = j + 1
-                if k >= len(pts):
-                    k = 0
-                if k == i or k == j:
-                    k = j + 1
-                #if the comparison and bigger variable disagree, then this segment is not an end to the complex hull.
-                if tangentLineCompare(pts[i], pts[j], pts[k]) != bigger:
-                    break      
-                cnt = cnt + 1
-            # if we reach the end of the while loop without any breaks then all the points are on one side. 
-            # so let's add it. 
-            if cnt == len(pts):
-                if pts[i] not in convexHull:
-                    convexHull.append(pts[i])
-                if pts[j] not in convexHull:
-                    convexHull.append(pts[j])
-            cnt = 0
+            neg = 0
+            pos = 0
+            
+            for k in range(len(pts)):
+                if tangentLineCompare(pts[i], pts[j], pts[k]) == 0:
+                    pos = pos + 1
+                elif tangentLineCompare(pts[i], pts[j], pts[k]) == 1:
+                    neg = neg + 1
+                elif tangentLineCompare(pts[i], pts[j], pts[k]) == 2:
+                    neg = neg + 1
+                    pos = pos + 1
+            
+            if pos >= len(pts) or neg >= len(pts):
+                #append the line segment
+                convexHull.append(pts[j])
+
+            # while cnt < len(pts):
+            #     k = k + 1
+            #     # reset k to check the points before the 
+            #     # line segment.
+            #     # don't want to check the points that we are using
+            #     if k == i or k == j:
+            #         k = j + 1
+            #     if k >= len(pts):
+            #         k = 0
+            #     if k == i or k == j:
+            #         k = j + 1
+            #     #if the comparison and bigger variable disagree, then this segment is not an end to the complex hull.
+            #     if tangentLineCompare(pts[i], pts[j], pts[k]) != bigger:
+            #         break      
+            #     cnt = cnt + 1
+            # # if we reach the end of the while loop without any breaks then all the points are on one side. 
+            # # so let's add it. 
+            # if cnt == len(pts):
+            #     if pts[i] not in convexHull:
+            #         convexHull.append(pts[i])
+            #     if pts[j] not in convexHull:
+            #         convexHull.append(pts[j])
     return convexHull
 
 
