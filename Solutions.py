@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 plt.close("all")
 #test points 
-points = [(0,0),(4,2),(6,3),(5,7),(3,100),(1,104),(7,90)]
+points = [(0,0),(4,2),(6,3),(5,7),(3,100),(1,104),(7,90),(31,22),(123,33),(-5,20)]
 
 #random points for complexity measurement
 randomPoints  = [(randint(0, 1000),randint(0, 1000)) for i in range(1000)]
@@ -210,27 +210,39 @@ def tangentLineCompare(a,b,compare):
         bigger = 2
     return bigger
 
+def hullSort(pts):
+    #first sort by y
+    pts.sort(key = lambda pts:pts[1])
+    #take top point, and proceed clockwise
+    sortedPts = []
+    sortedPts.append(pts[0])
+    if pts[1][0] > sortedPts[0][0]:
+        pts = pts
+
+    return sortedPts
+
 def BruteForceConvexHull(pts):
     #sorting by x to get farthest left point.
     pts.sort(key = lambda pts:pts[0])
     convexHull = []
-    convexHull.append(pts[0])
+    convexHull.append(min(pts))
+    Size = len(pts)
     #loop through all segments and make a line between the two.
     # use the y=mx+b
-    m = None
-    for i in range(len(pts)):
-        for j in range(i+1,len(pts)):
-            if j == i and i >= len(pts) - 1:
-                j = 0
-            elif j == i and i < len(pts):
-                j = i + 1
-            if j >= len(pts):
-                j = 0
+    # m = None
+    for i in range(Size):
+        for j in range(i+1,Size):
+            # if j == i and i >= len(pts) - 1:
+            #     j = 0
+            # elif j == i and i < len(pts):
+            #     j = i + 1
+            # if j >= len(pts):
+            #     j = 0
             #find slope
-            m = slope(pts[i],pts[j])
-            #use slope to find line intersect
-            YIntersect = findYIntersect(pts[i], m)
-            #for every point that is not i or j
+            # m = slope(pts[i],pts[j])
+            # #use slope to find line intersect
+            # YIntersect = findYIntersect(pts[i], m)
+            # #for every point that is not i or j
             # k = j + 1
             # if k >= len(pts):
             #     k = 0
@@ -240,7 +252,7 @@ def BruteForceConvexHull(pts):
             neg = 0
             pos = 0
             
-            for k in range(len(pts)):
+            for k in range(Size):
                 if tangentLineCompare(pts[i], pts[j], pts[k]) == 0:
                     pos = pos + 1
                 elif tangentLineCompare(pts[i], pts[j], pts[k]) == 1:
@@ -253,32 +265,20 @@ def BruteForceConvexHull(pts):
                 #append the line segment
                 convexHull.append(pts[j])
 
-            # while cnt < len(pts):
-            #     k = k + 1
-            #     # reset k to check the points before the 
-            #     # line segment.
-            #     # don't want to check the points that we are using
-            #     if k == i or k == j:
-            #         k = j + 1
-            #     if k >= len(pts):
-            #         k = 0
-            #     if k == i or k == j:
-            #         k = j + 1
-            #     #if the comparison and bigger variable disagree, then this segment is not an end to the complex hull.
-            #     if tangentLineCompare(pts[i], pts[j], pts[k]) != bigger:
-            #         break      
-            #     cnt = cnt + 1
-            # # if we reach the end of the while loop without any breaks then all the points are on one side. 
-            # # so let's add it. 
-            # if cnt == len(pts):
-            #     if pts[i] not in convexHull:
-            #         convexHull.append(pts[i])
-            #     if pts[j] not in convexHull:
-            #         convexHull.append(pts[j])
+            convexHull.sort(key = lambda convexHull:convexHull[1])
+            # 
     return convexHull
 
 
 ### problem 4
+'''
+need to use the divide and conquer approach to the convex hull problem
+'''
+def DnC_ComplexHull(pts):
+    complexHull = []
+    midPoint = len(pts) // 2
+    return complexHull
+
 
 
 
@@ -349,7 +349,6 @@ df = pd.DataFrame(points,
 
 ax1 = df.plot.scatter(x='x', y='y')
 '''
-
 
 
 #graphing problem 3
