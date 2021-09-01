@@ -188,50 +188,44 @@ the Convex Hull if and only if all other points are on the same side of
 that segment.
 '''
 
-def slope(a,b):
-    if b[0] - a[0] != 0:
-        m = (b[1]-a[1])/(b[0]-a[0])
-    return m
+# def slope(a,b):
+#     if b[0] - a[0] != 0:
+#         m = (b[1]-a[1])/(b[0]-a[0])
+#     return m
 
-#y=mx+b so b = y-mx
-def findYIntersect(a,m):
-    YIntersect = a[1]-m*a[0]
-    return YIntersect
+# #y=mx+b so b = y-mx
+# def findYIntersect(a,m):
+#     YIntersect = a[1]-m*a[0]
+#     return YIntersect
 
-def tangentLineCompare(a,b,compare):
-    m = slope(a,b)
-    const = findYIntersect(a, m)
-    bigger = 3
-    if compare[0]*m + const < compare[1]:
-        bigger = 0
-    elif compare[0]*m + const > compare[1]:
-        bigger = 1
-    elif compare[0]*m + const == compare[1]:
-        bigger = 2
-    return bigger
+# def tangentLineCompare(a,b,compare):
+#     m = slope(a,b)
+#     const = findYIntersect(a, m)
+#     bigger = 3
+#     if compare[0]*m + const < compare[1]:
+#         bigger = 0
+#     elif compare[0]*m + const > compare[1]:
+#         bigger = 1
+#     elif compare[0]*m + const == compare[1]:
+#         bigger = 2
+#     return bigger
 
-def hullSort(pts):
-    #first sort by y
-    pts.sort(key = lambda pts:pts[1])
-    #take top point, and proceed clockwise
-    sortedPts = []
-    sortedPts.append(pts[0])
-    if pts[1][0] > sortedPts[0][0]:
-        pts = pts
+def onRight(pt1,pt2,ptk):
+    comp = (ptk[0]-pt1[0])*(pt2[1]-pt1[1])-(ptk[1]-pt1[1])*(pt2[0]-pt1[0])
+    return comp
 
-    return sortedPts
 
 def BruteForceConvexHull(pts):
     #sorting by x to get farthest left point.
-    pts.sort(key = lambda pts:pts[0])
+    # pts.sort(key = lambda pts:pts[0])
     convexHull = []
-    convexHull.append(min(pts))
+    # convexHull.append(min(pts))
     Size = len(pts)
     #loop through all segments and make a line between the two.
     # use the y=mx+b
     # m = None
     for i in range(Size):
-        for j in range(i+1,Size):
+        for j in range(Size):
             # if j == i and i >= len(pts) - 1:
             #     j = 0
             # elif j == i and i < len(pts):
@@ -249,23 +243,27 @@ def BruteForceConvexHull(pts):
             # bigger = tangentLineCompare(pts[i], pts[j], pts[k])
             #check that every point is checked even if we passed
             #it already.
-            neg = 0
-            pos = 0
+            valid = None
+            if i == j:
+                valid = False
+            lef = 0
+            rit = 0
             
-            for k in range(Size):
-                if tangentLineCompare(pts[i], pts[j], pts[k]) == 0:
-                    pos = pos + 1
-                elif tangentLineCompare(pts[i], pts[j], pts[k]) == 1:
-                    neg = neg + 1
-                elif tangentLineCompare(pts[i], pts[j], pts[k]) == 2:
-                    neg = neg + 1
-                    pos = pos + 1
-            
-            if pos >= len(pts) or neg >= len(pts):
-                #append the line segment
-                convexHull.append(pts[j])
-
-            convexHull.sort(key = lambda convexHull:convexHull[1])
+            for p in pts:
+                if p != pts[j] and p != pts[i]:
+                    if onRight(pts[i], pts[j], p) == 0:
+                        lef = lef + 1
+                        rit = rit + 1
+                    if onRight(pts[i], pts[j], p) < 0:
+                        lef = lef + 1
+                        valid = False
+                    elif onRight(pts[i], pts[j], p) > 0:
+                        rit = rit + 1
+                        valid = True
+                if (rit >= Size-2) and valid and pts[j] not in convexHull:
+                    convexHull.append(pts[i])
+                    convexHull.append(pts[j])
+            #convexHull.sort(key = lambda convexHull:convexHull[1])
             # 
     return convexHull
 
