@@ -11,7 +11,7 @@ plt.close("all")
 points = [(0,0),(4,2),(6,3),(5,7),(3,100),(1,104),(7,90),(31,22),(123,33),(-5,20)]
 
 #random points for complexity measurement
-randomPoints  = [(randint(0, 1000),randint(0, 1000)) for i in range(1000)]
+randomPoints  = [(randint(0, 100),randint(0, 100)) for i in range(100)]
 
 #this algorithm runs the distance formula on two points.
 def distance(a,b):
@@ -31,12 +31,14 @@ def distance(a,b):
 This problem involves using a Brute-Force approach to finding 
 the closest distance between two points in a graph.:
 '''
+pointsOfMinimumBF = [(0,0),(0,0)]
 def bruteForceSmallestDistance(pts):
      #take one point then compare to all other points
      # then take the next point and compare to 
      # the following points
      # biggest integer value]
      minimum = 2147483647
+     
      ArrSize = len(pts)
      #print("length of points is " + str(len(pts)))
      for i in range(ArrSize):
@@ -45,6 +47,8 @@ def bruteForceSmallestDistance(pts):
              #print("j point is " + str(pts[j]))
              if distance(pts[i],pts[j]) < minimum:
                 minimum = distance(pts[i],pts[j])
+                pointsOfMinimumBF[0] = pts[i]
+                pointsOfMinimumBF[1] = pts[j]
      return minimum   
 
 def timeBruteForceSmallestDistance():
@@ -299,6 +303,19 @@ complexityPoints = []
 complexityPoints = timeBruteForceSmallestDistance()
 #complexityPoints = [0,0]
 #complexityPoints[1] = timeDnCShortestDistance()
+xPts = []
+yPts = []
+xMinPts = []
+yMinPts = []
+for i in range(len(points)):
+    xPts.append(points[i][0])
+    yPts.append(points[i][1])
+for j in range(2):
+    xMinPts.append(pointsOfMinimumBF[j][0])
+    yMinPts.append(pointsOfMinimumBF[j][1])
+plt.scatter(xPts,yPts, marker='o')
+plt.plot(xMinPts,yMinPts)
+
 
 plt.plot(range(0,300,10),complexityPoints)
 #plt.plot(range(2),complexityPoints)
@@ -336,9 +353,12 @@ plt.show()
 # graphing the points 
 xPts = []
 yPts = []
-for i in range(len(points)):
-    xPts.append(points[i][0])
-    yPts.append(points[i][1])
+# for i in range(len(points)):
+#     xPts.append(points[i][0])
+#     yPts.append(points[i][1])
+for i in range(len(randomPoints)):
+    xPts.append(randomPoints[i][0])
+    yPts.append(randomPoints[i][1])
 
 plt.scatter(xPts,yPts, marker='o')
 '''
@@ -352,14 +372,14 @@ ax1 = df.plot.scatter(x='x', y='y')
 #graphing problem 3
 
 
-print("the points for the convex hull through brute force is " + str(BruteForceConvexHull(points)))
+print("the points for the convex hull through brute force is " + str(BruteForceConvexHull(randomPoints)))
 
 
 complexityPoints = []
-complexityPoints = BruteForceConvexHull(points)
+complexityPoints = BruteForceConvexHull(randomPoints)
 xPts = []
 yPts = []
-for i in range(len(BruteForceConvexHull(points))):
+for i in range(len(BruteForceConvexHull(randomPoints))):
     xPts.append(complexityPoints[i][0])
     yPts.append(complexityPoints[i][1])
 #complexityPoints = [0,0]
