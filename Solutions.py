@@ -274,19 +274,40 @@ def BruteForceConvexHull(pts):
 
 ### problem 4
 '''
-need to use the divide and conquer approach to the convex hull problem
+need to use the divide and conquer approach to the Andrews algorithm.
 '''
+
+def andrewsScan(pts):
+    #sort by x 
+    Size = len(pts)
+    if Size < 2:
+        return pts[0]
+    pts.sort(key = lambda pts:pts[0])
+    convexHull = [pts[0]]
+    pListUH = [pts[0],pts[1]]
+    #find the upper hull
+    for i in range(2,Size-1):
+        pListUH.append(pts[i])
+        while len(pListUH) > 2 and onRight(pts[i-2], pts[i-1], pts[i]) > 0:
+            pListUH.pop()
+    
+    pListLH = [pts[Size-1],pts[Size-2]]
+    for i in range(Size-3,0,-1):
+        pListLH.append(pts[i])
+        while len(pListUH) > 2 and onRight(pts[i],pts[i-1], pts[i]) > 0:
+            pListLH.pop()
+    for i in range(1,len(pListUH)):
+        convexHull.append(pListUH[i])
+    for j in range(len(pListLH)):
+        convexHull.append(pListLH[j])    
+    return convexHull
+
+### problem 5
+
 def DnC_ComplexHull(pts):
     complexHull = []
     midPoint = len(pts) // 2
     return complexHull
-
-
-
-
-
-### problem 5
-
 
 
 
@@ -393,3 +414,45 @@ plt.xlabel('x points')
 plt.ylabel('y points')
 plt.title('convex hull brute force')
 plt.show()
+
+
+
+
+#problem 4
+
+
+print("the points for the convex hull through Andrews Scan is " + str(andrewsScan(points)))
+
+
+complexityPoints = []
+complexityPoints = andrewsScan(points)
+xPts = []
+yPts = []
+for i in range(len(andrewsScan(points))):
+    xPts.append(complexityPoints[i][0])
+    yPts.append(complexityPoints[i][1])
+#complexityPoints = [0,0]
+#complexityPoints[1] = timeDnCShortestDistance()
+xPts.append(xPts[0])
+yPts.append(yPts[0])
+plt.plot(xPts,yPts)
+
+
+xPts = []
+yPts = []
+xMinPts = []
+yMinPts = []
+for i in range(len(points)):
+    xPts.append(points[i][0])
+    yPts.append(points[i][1])
+plt.scatter(xPts,yPts, marker='o')
+plt.plot(xMinPts,yMinPts)
+
+#plt.plot(range(2),complexityPoints)
+
+plt.xlabel('x points')
+plt.ylabel('y points')
+plt.title('convex hull andrews scan')
+plt.show()
+
+
