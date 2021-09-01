@@ -6,7 +6,6 @@ from math import sqrt
 import matplotlib.pyplot as plt
 ### global section.
 
-plt.close("all")
 #test points 
 points = [(0,0),(4,2),(6,3),(5,7),(3,100),(1,104),(7,90),(31,22),(123,33),(-5,20)]
 
@@ -216,6 +215,7 @@ that segment.
 
 def onRight(pt1,pt2,ptk):
     comp = (ptk[0]-pt1[0])*(pt2[1]-pt1[1])-(ptk[1]-pt1[1])*(pt2[0]-pt1[0])
+    # comp = (pt1[0]-ptk[0])*(pt2[1]-ptk[1])-(pt1[1]-ptk[1])*(pt2[0]-ptk[0])
     return comp
 
 
@@ -258,7 +258,7 @@ def BruteForceConvexHull(pts):
                     if onRight(pts[i], pts[j], p) == 0:
                         lef = lef + 1
                         rit = rit + 1
-                    if onRight(pts[i], pts[j], p) < 0:
+                    elif onRight(pts[i], pts[j], p) < 0:
                         lef = lef + 1
                         valid = False
                     elif onRight(pts[i], pts[j], p) > 0:
@@ -283,20 +283,20 @@ def andrewsScan(pts):
     if Size < 2:
         return pts[0]
     pts.sort(key = lambda pts:pts[0])
-    convexHull = [pts[0]]
+    convexHull = []
     pListUH = [pts[0],pts[1]]
     #find the upper hull
     for i in range(2,Size-1):
         pListUH.append(pts[i])
-        while len(pListUH) > 2 and onRight(pts[i-2], pts[i-1], pts[i]) > 0:
+        while len(pListUH) >= 2 and onRight(pts[i], pts[i-1], pts[i-2]) > 0:
             pListUH.pop()
     
     pListLH = [pts[Size-1],pts[Size-2]]
     for i in range(Size-3,0,-1):
         pListLH.append(pts[i])
-        while len(pListUH) > 2 and onRight(pts[i],pts[i-1], pts[i]) > 0:
+        while len(pListLH) >= 2 and onRight(pts[i],pts[i-1], pts[i-2]) < 0:
             pListLH.pop()
-    for i in range(1,len(pListUH)):
+    for i in range(0,len(pListUH)):
         convexHull.append(pListUH[i])
     for j in range(len(pListLH)):
         convexHull.append(pListLH[j])    
