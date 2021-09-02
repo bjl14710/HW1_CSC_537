@@ -37,7 +37,8 @@ def bruteForceSmallestDistance(pts):
      # the following points
      # biggest integer value]
      minimum = 2147483647
-     
+     point1 = [0,0]
+     point2 = [0,0]
      ArrSize = len(pts)
      #print("length of points is " + str(len(pts)))
      for i in range(ArrSize):
@@ -46,9 +47,9 @@ def bruteForceSmallestDistance(pts):
              #print("j point is " + str(pts[j]))
              if distance(pts[i],pts[j]) < minimum:
                 minimum = distance(pts[i],pts[j])
-                pointsOfMinimumBF[0] = pts[i]
-                pointsOfMinimumBF[1] = pts[j]
-     return minimum   
+                point1 = pts[i]
+                point2 = pts[j]
+     return point1, point2
 
 def timeBruteForceSmallestDistance():
     times = []
@@ -431,11 +432,12 @@ yMinPts = []
 for i in range(len(points)):
     xPts.append(points[i][0])
     yPts.append(points[i][1])
-for j in range(2):
-    xMinPts.append(pointsOfMinimumBF[j][0])
-    yMinPts.append(pointsOfMinimumBF[j][1])
 plt.scatter(xPts,yPts, marker='o')
-plt.plot(xMinPts,yMinPts)
+xPts = []
+yPts = []
+xPts = bruteForceSmallestDistance(points)[0]
+yPts = bruteForceSmallestDistance(points)[1]
+plt.plot(xPts,yPts)
 
 
 plt.plot(range(0,300,10),complexityPoints)
