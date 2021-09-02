@@ -213,9 +213,10 @@ that segment.
 #         bigger = 2
 #     return bigger
 
-def onRight(pt1,pt2,ptk):
+#pt1 is 0 pt2 is b and ptk is a
+def crossSection(pt1,ptk,pt2):
+    # comp = (ptk[0]-pt1[0])*(pt2[1]-pt1[1])-(ptk[1]-pt1[1])*(pt2[0]-pt1[0])
     comp = (ptk[0]-pt1[0])*(pt2[1]-pt1[1])-(ptk[1]-pt1[1])*(pt2[0]-pt1[0])
-    # comp = (pt1[0]-ptk[0])*(pt2[1]-ptk[1])-(pt1[1]-ptk[1])*(pt2[0]-ptk[0])
     return comp
 
 
@@ -255,13 +256,13 @@ def BruteForceConvexHull(pts):
             
             for p in pts:
                 if p != pts[j] and p != pts[i]:
-                    if onRight(pts[i], pts[j], p) == 0:
+                    if crossSection(pts[i], pts[j], p) == 0:
                         lef = lef + 1
                         rit = rit + 1
-                    elif onRight(pts[i], pts[j], p) < 0:
+                    elif crossSection(pts[i], pts[j], p) < 0:
                         lef = lef + 1
                         valid = False
-                    elif onRight(pts[i], pts[j], p) > 0:
+                    elif crossSection(pts[i], pts[j], p) > 0:
                         rit = rit + 1
                         valid = True
                 if (rit >= Size-2) and valid and pts[j] not in convexHull:
@@ -284,23 +285,122 @@ def andrewsScan(pts):
         return pts[0]
     pts.sort(key = lambda pts:pts[0])
     convexHull = []
-    pListUH = [pts[0],pts[1]]
-    #find the upper hull
-    for i in range(2,Size-1):
-        pListUH.append(pts[i])
-        while len(pListUH) >= 2 and onRight(pts[i], pts[i-1], pts[i-2]) > 0:
-            pListUH.pop()
-    
-    pListLH = [pts[Size-1],pts[Size-2]]
-    for i in range(Size-3,0,-1):
-        pListLH.append(pts[i])
-        while len(pListLH) >= 2 and onRight(pts[i],pts[i-1], pts[i-2]) < 0:
+    pListUH = []
+    pListLH = []
+    #build lower hall
+    for p in pts:
+        while len(pListLH) >= 2 and crossSection(pListLH[-2], pListLH[-1], p) <= 0:
             pListLH.pop()
+        pListLH.append(p)
+    #build upper hall
+    for p in pts:
+        while len(pListUH) >= 2 and crossSection(pListUH[-2], pListUH[-1], p) <= 0:
+            pListUH.pop()
+        pListUH.append(p)
+
+    #build uH
+    #find the upper hull
+    # for i in range(2,Size-1):
+    #     pListUH.append(pts[i])
+    #     while len(pListUH) >= 2 and crossSection(pts[i], pts[i-1], pts[i-2]) > 0:
+    #         pListUH.pop()
+    
+    # pListLH = [pts[Size-1],pts[Size-2]]
+    # for i in range(Size-3,0,-1):
+    #     pListLH.append(pts[i])
+    #     while len(pListLH) >= 2 and crossSection(pts[i],pts[i-1], pts[i-2]) < 0:
+    #         pListLH.pop()
     for i in range(0,len(pListUH)):
         convexHull.append(pListUH[i])
     for j in range(len(pListLH)):
         convexHull.append(pListLH[j])    
     return convexHull
+
+
+#TODO: remove this part of the code
+def convex_hull(points):
+
+    """Computes the convex hull of a set of 2D points.
+
+ 
+
+    Input: an iterable sequence of (x, y) pairs representing the points.
+
+    Output: a list of vertices of the convex hull in counter-clockwise order,
+
+      starting from the vertex with the lexicographically smallest coordinates.
+
+    Implements Andrew's monotone chain algorithm. O(n log n) complexity.
+
+    """
+
+ 
+
+    # Sort the points lexicographically (tuples are compared lexicographically).
+
+    # Remove duplicates to detect the case we have just one unique point.
+
+    points = sorted(set(points))
+
+ 
+
+    # Boring case: no points or a single point, possibly repeated multiple times.
+
+    if len(points) <= 1:
+
+        return points
+
+ 
+
+    # 2D cross product of OA and OB vectors, i.e. z-component of their 3D cross product.
+
+    # Returns a positive value, if OAB makes a counter-clockwise turn,
+
+    # negative for clockwise turn, and zero if the points are collinear.
+
+    def cross(o, a, b):
+
+        return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
+
+ 
+
+    # Build lower hull
+
+    lower = []
+
+    for p in points:
+
+        while len(lower) >= 2 and cross(lower[-2], lower[-1], p) <= 0:
+
+            lower.pop()
+
+        lower.append(p)
+
+ 
+
+    # Build upper hull
+
+    upper = []
+
+    for p in reversed(points):
+
+        while len(upper) >= 2 and cross(upper[-2], upper[-1], p) <= 0:
+
+            upper.pop()
+
+        upper.append(p)
+
+ 
+
+    # Concatenation of the lower and upper hulls gives the convex hull.
+
+    # Last point of each list is omitted because it is repeated at the beginning of the other list.
+
+    return lower[:-1] + upper[:-1]
+
+ 
+
+# Example: convex hull of a 10-by-10 grid.
 
 ### problem 5
 
