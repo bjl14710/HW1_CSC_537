@@ -4,44 +4,68 @@ import time
 from random import randint
 from math import sqrt
 import matplotlib.pyplot as plt
-import problem1
+
 ### global section.
 
 #test points 
 points = [(0,0),(4,2),(6,3),(5,7),(3,100),(1,104),(7,90),(31,22),(123,33),(-5,20)]
 
 #random points for complexity measurement
-randomPoints  = [(randint(0, 100),randint(0, 100)) for i in range(100)]
+randomPoints  = [(randint(0, 100),randint(0, 100)) for i in range(500)]
 
 #this algorithm runs the distance formula on two points.
-def distance(a,b):
-    diffX = a[0]-b[0]
-    diffY = a[1]-b[1]
-    #print("diff x is " + str(diffX * diffX))
-    #print("diff y is " + str(diffY * diffY))
+def distance(p1,p2):
+    diffX = p1[0]-p2[0]
+    diffY = p1[1]-p2[1]
     dist = sqrt(diffX*diffX + diffY*diffY)
     return dist
 
 def shortestDistStrip(pts,dist):
     Size = len(pts)
-    minimum = 2147483647
+    minimum = float('inf')
+    global MinimumPoint1, MinimumPoint2, MinimumPoint3, MinimumPoint4
     List = []
+    point1 = None
+    point2 = None
     #look through set, check to see that the y values are of a certain distance less than dist.
     for i in range(Size):
         j = i + 1
         while j < Size and (pts[i][1]-pts[j][1] < dist):
             List.append(distance(pts[j],pts[i]))
             j = j + 1
+            point1 = pts[i]
+            if j < Size:
+                point2 = pts[j]
     if len(List) > 0:
         minimum = min(List)
+    if minimum < dist:
+        MinimumPoint1 = point1
+        MinimumPoint2 = point2
     return minimum
+
+#from problem 1
+def bruteForceSmallestDistance(pts):
+     minimum = float('inf')
+     point1 = [0,0]
+     point2 = [0,0]
+     ArrSize = len(pts)
+     for i in range(ArrSize):
+         for j in range(i+1,ArrSize):
+             if distance(pts[i],pts[j]) < minimum:
+                minimum = distance(pts[i],pts[j])
+                point1 = pts[i]
+                point2 = pts[j]
+     return point1, point2
+
+def minimumBruteForceDist(pts):
+    return distance(bruteForceSmallestDistance(pts)[0],bruteForceSmallestDistance(pts)[1])
 
 def DnCShortestDistance(half,ySortedPts,n):
     Size = len(half)
-    minimum = 2147483647
-    minimumLeft = 2147483647
-    minimumRight = 2147483647
-    minimumStrip = 2147483647
+    minimum = float('inf')
+    minimumLeft = float('inf')
+    minimumRight = float('inf')
+    minimumStrip = float('inf')
     #initializing all the lists
     leftList = []
     rightList = []
@@ -49,40 +73,26 @@ def DnCShortestDistance(half,ySortedPts,n):
     
 
     if n <= 3:
-        return bruteForceSmallestDistance(half)
-    '''
-    if Size >= 5:
-        #size of intersection is 5. for 5 points.
-        print("size of intersection is 5")
-        middleList = [(0,0)] * 5
-    else:
-        print("size of intersection is " + str(Size))
-        middleList = [(0,0)] * Size
-        #size of intersection is amount of points there are.
-    '''
-
+        return minimumBruteForceDist(half)
     # need to sort by X first
 
     # need to find the middle x position
     mid = n // 2
     midPoint = half[mid]
-    # #defining the lists to the points
-    #sortedX = pts.sorted(pts, key = lambda x: x[0])
-    # do I need to recursively keep breaking it down in half or just brute force the left and the right.
     leftList = half[:mid]
     rightList = half[mid:]
     minimumLeft = DnCShortestDistance(leftList,ySortedPts,mid)
     minimumRight = DnCShortestDistance(rightList,ySortedPts,n-mid)
     minimum = min(minimumLeft, minimumRight)
     # finding the starting position of the middle section to look at. 
+    
     beginSpanX = midPoint[0] - minimum
     endingSpanX = midPoint[0] + minimum
-    #Use y sorted points
+    #Use points sorted by y
     #check if it is in the span of x and y 
     ySortedPts.reverse()
-    # need to find the points in the strip.
+    # need to find the points in the span.
     for strip in ySortedPts:
-        #check if it is in the span
         if strip[0] <= endingSpanX and strip[0] >= beginSpanX:
             stripList.append(strip)
             #break free if we have our first 5 elements.
@@ -112,7 +122,6 @@ def timeDnCShortestDistance():
         elapsed_time = time.time()-start_time
         times.append(elapsed_time)
     return times
-
 
 
 print("The smallest distance by Divide and conquer is " + str(DivideAndConquerDistanceAlgorithm(points)))

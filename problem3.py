@@ -34,11 +34,12 @@ def orderPairs(a):
     orderedPairs.append(a[1])
     holder = a[1]
     #first line segment is a[0],a[1]
-    for i in range(2,Size-1):
-        if a[i] == holder:
-            orderedPairs.append(a[i+1])  
-            holder = a[i+1]
-            i=i+2
+    for i in range(1,Size):
+            
+        # if a[i] == holder:
+        #     orderedPairs.append(a[i+1])  
+        #     holder = a[i+1]
+        #     i=i+2
     return orderedPairs
 
 # def removeDuplicates(a):
@@ -63,20 +64,28 @@ def BruteForceConvexHull(pts):
     # m = None
     # convexHull.append(pts[0])
     cnt = 0
+    onLeft = onRight = False
     valid = False
     for i in range(Size):
         for j in range(Size):
+            partOfConvexHull = True
             if not (i == j):
                 valid = True
                 for p in pts:
-                    if not (p == pts[j]) and not (p==pts[i]):
+                    if (p != pts[j]) and (p!=pts[i]):
                         if _det(pts[i],pts[j],p) < 0:
-                            valid = False
-                if valid:
-                    convexHull.append(pts[i])
-                    convexHull.append(pts[j])
-                    # holdList.append(convexHull[cnt])
-                    cnt = cnt + 1
+                            onRight = True
+                            # valid = False
+                        elif _det(pts[i],pts[j],p) > 0:
+                            onLeft = True
+                            # valid = False
+            if onLeft == True and onRight == True:
+                valid = False
+        if valid:
+            convexHull.append(pts[i])
+            convexHull.append(pts[j])
+            # holdList.append(convexHull[cnt])
+            cnt = cnt + 1
     
     # convexHull = orderPairs(convexHull)
     # convexHull = orderPairs(convexHull)
