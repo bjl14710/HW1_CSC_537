@@ -4,7 +4,7 @@ import time
 from random import randint
 from math import sqrt
 import matplotlib.pyplot as plt
-import problem1
+
 ### global section.
 
 #test points 
@@ -22,6 +22,33 @@ def crossSection(pt1,pt2,ptk):
 #     comp = (ptk[0]-pt1[0])*(pt2[1]-pt1[1])-(ptk[1]-pt1[1])*(pt2[0]-pt1[0])
 #     return comp
 
+def _det(a,b,c):
+    return (a[0] * b[1] + b[0] * c[1] + c[0] * a[1]) - (a[1] * b[0] + b[1] * c[0] + c[1] * a[0])
+
+#loop through all pairs and find what is connected
+def orderPairs(a):
+    Size = len(a)
+    # orderedPairs = [[],[]]
+    orderedPairs = []
+    orderedPairs.append(a[0])
+    orderedPairs.append(a[1])
+    holder = a[1]
+    #first line segment is a[0],a[1]
+    for i in range(2,Size-1):
+        if a[i] == holder:
+            orderedPairs.append(a[i+1])  
+            holder = a[i+1]
+            i=i+2
+    return orderedPairs
+
+# def removeDuplicates(a):
+#     Size = len(a)
+#     newPts = a
+#     for i in range(len(newPts)):
+#         for j in range(len(newPts)):
+#             if a[i] == a[j]:
+#                 newPts.pop(j)
+#     return newPts
 
 def BruteForceConvexHull(pts):
     #sorting by x to get farthest left point.
@@ -30,10 +57,12 @@ def BruteForceConvexHull(pts):
     # convexHull.append(min(pts))
     Size = len(pts)
     pts.sort(key = lambda pts:pts[0])
+    holdList = []
     #loop through all segments and make a line between the two.
     # use the y=mx+b
     # m = None
     # convexHull.append(pts[0])
+    cnt = 0
     valid = False
     for i in range(Size):
         for j in range(Size):
@@ -41,15 +70,33 @@ def BruteForceConvexHull(pts):
                 valid = True
                 for p in pts:
                     if not (p == pts[j]) and not (p==pts[i]):
-                        if crossSection(pts[i],pts[j],p) < 0:
+                        if _det(pts[i],pts[j],p) < 0:
                             valid = False
                 if valid:
                     convexHull.append(pts[i])
                     convexHull.append(pts[j])
-                    
+                    # holdList.append(convexHull[cnt])
+                    cnt = cnt + 1
+    
+    # convexHull = orderPairs(convexHull)
+    # convexHull = orderPairs(convexHull)
+    # convexHull = list(set(convexHull))
+    
+    # for i in range(Size-1):
+    #     for j in range(Size):
+    #         ptCnt = 0
+    #         for p in pts:
+    #             if not p == pts[i] and not p == pts[j]:
+    #                 if _det(pts[i],pts[j],p) < 0:
+    #                     ptCnt = ptCnt + 1
+    #                 if ptCnt == Size-2:
+    #                     convexHull.append(pts[i])
+    #                     convexHull.append(pts[j])
 
-
-
+    
+    
+    
+    
     # for i in range(Size):
     #     for j in range(Size):
     #         # if j == i and i >= len(pts) - 1:
@@ -107,7 +154,8 @@ def printPoints(pts):
     plt.scatter(xPts,yPts, marker='o')
 
 print("the points for the convex hull through brute force is " + str(BruteForceConvexHull(randomPoints)))
-
+convexHullPoints = BruteForceConvexHull(randomPoints)
+# print("the points for the convex hull through brute force is " + str(orderPairs(convexHullPoints)))
 
 complexityPoints = []
 complexityPoints = BruteForceConvexHull(randomPoints)
